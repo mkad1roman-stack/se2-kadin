@@ -7,16 +7,19 @@
 | User | id, email, passwordHash, role, blocked | register(), login(), block() |
 | Brand | id, name | rename() |
 | Product | id, brandId, name, category, price, active | update(), hide() |
+| ProductVariant | id, productId, sku, size, color, stock, reserved | available(), reserve(), release() |
 | Cart | id, userId, sessionId | calculateTotal() |
-| CartItem | cartId, productId, quantity | setQuantity(), remove() |
-| Order | id, userId, status, total, address, phone | create(), cancel(), ship() |
-| OrderItem | orderId, productId, quantity, unitPrice | lineTotal() |
-| Payment | id, orderId, providerId, amount, status | start(), confirm() |
+| CartItem | cartId, variantId, quantity | setQuantity(), remove() |
+| Order | id, userId, requestKey, status, total, address, phone | create(), cancel(), ship() |
+| OrderItem | orderId, variantId, quantity, unitPrice, title, size, color | lineTotal() |
+| Payment | id, orderId, providerId, amount, currency, status | start(), confirm() |
 | Notification | id, orderId, type, status, attempts | queue(), send() |
 
 ![Диаграмма классов](5-classes.png)
 
-CartItem и OrderItem связаны с Product. Order содержит позиции OrderItem и принадлежит User. Payment и Notification относятся к одному Order.
+Связи: Brand 1 — 0..* Product; Product 1 — 1..* ProductVariant; User 1 — 0..1 Cart; Cart 1 — 0..* CartItem; ProductVariant 1 — 0..* CartItem; User 1 — 0..* Order; Order 1 — 1..* OrderItem; ProductVariant 1 — 0..* OrderItem; Order 1 — 0..* Payment; Order 1 — 0..* Notification.
+
+Для гостевой корзины userId пуст, используется sessionId; при входе корзина связывается с пользователем. В OrderItem фиксируются цена, название и выбранные размер и цвет на момент заказа. В ProductVariant available = stock − reserved. В каталоге показываются только активные карточки; варианты, встречающиеся в заказах, физически не удаляются.
 
 ## Последовательность оформления
 
